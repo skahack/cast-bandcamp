@@ -1,0 +1,17 @@
+{
+  "manifest_version": 2,
+
+  "name": "Cast Bandcamp",
+  "description": "",
+  "version": "0.0.1",
+
+  "content_scripts": [{
+    "matches": ["*://*.bandcamp.com/album/*"],
+    "js": [ "index.js" ]
+  }],
+
+  "web_accessible_resources": [
+    "sender.js",
+    "*.png"
+  ]
+}

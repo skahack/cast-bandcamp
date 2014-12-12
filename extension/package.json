@@ -1,0 +1,17 @@
+{
+  "name": "cast-bandcamp-extension",
+  "version": "0.1.0",
+  "description": "sender extension",
+  "main": "index.js",
+  "scripts": {
+    "build": "browserify js/sender.js > sender.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "debug": "^2.1.0"
+  },
+  "devDependencies": {
+    "browserify": "^7.0.0"
+  }
+}
