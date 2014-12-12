@@ -1,0 +1,172 @@
+@import 'FortAwesome/Font-Awesome';
+
+body {
+  overflow: hidden;
+  background-color: #111;
+  color: #fff;
+  margin: 0;
+}
+
+.player {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+img {
+  position: absolute;
+  top: 50%;
+  margin-top: -200px;
+  max-height: 400px;
+  max-width: 400px;
+  left: 5%;
+}
+
+.album-wrapper {
+  position: absolute;
+  top: 10%;
+  left: 5%;
+}
+.desc-wrapper {
+  position: absolute;
+  top: 22%;
+  left: 40%;
+  width: 60%;
+  height: 220px;
+  overflow: hidden;
+}
+.tracks-wrapper {
+  position: absolute;
+  top: 22%;
+  left: 40%;
+  width: 60%;
+  margin-top: 220px;
+}
+
+.artist {
+  font-size: 16px;
+}
+.artist-by {
+  margin-right: 5px;
+  color: #777;
+}
+
+.album-title {
+  font-size: 25px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 100%;
+  overflow: hidden;
+}
+
+.track-title {
+  display: table;
+  height: 100%;
+}
+.track-title-inner {
+  font-size: 45px;
+  line-height: 1;
+  margin-bottom: 40px;
+  padding-right: 20px;
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.tracks {
+  list-style-type: none;
+  padding: 0;
+  font-size: 16px;
+  width: 50%;
+  float: left;
+  color: #777;
+}
+.tracks.is-hidden {
+  display: none;
+}
+
+.track {
+  display: inline-block;
+  color: inherit;
+  width: 100%;
+  margin: 3px 0;
+  font-size: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 20px;
+  box-sizing: border-box;
+}
+.track.is-current {
+  color: #1FAE5B;
+}
+
+.track-num {
+  margin-right: 10px;
+}
+
+.filter {
+  width: 100%;
+  height: 120px;
+  position: absolute;
+  bottom: 0;
+  background: -webkit-gradient(
+    linear, left top, left bottom,
+    color-stop(0%, rgba(17,17,17,0.0)),
+    color-stop(5%, rgba(17,17,17,0.5)),
+    color-stop(17%, rgba(17,17,17,0.8)),
+    color-stop(40%,rgba(17,17,17,1)));
+}
+
+.bar {
+  width: 100%;
+  height: 3px;
+  background: #0F3225;
+  position: absolute;
+  top: 90%;
+}
+.bar.is-active {
+  background: #1FAE5B;
+  transition: width 1s linear 0;
+}
+
+.time {
+  position: absolute;
+  top: 90%;
+  width: 100%;
+  color: #777;
+  margin-top: 5px;
+}
+.time.is-left {
+  left: 5px;
+}
+.time.is-right {
+  text-align: right;
+  right: 5px;
+}
+
+.clock {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 42px;
+  color: rgba(255,255,255,0.4);
+  line-height: 1;
+}
+.clock-dayname {
+  margin-right: 5px;
+  font-size: 22px;
+}
+.clock-cal {
+  text-align: right;
+}
+.clock-month {
+  margin-right: 5px;
+  font-size: 17px;
+}
+.clock-day{
+  margin-right: 5px;
+  font-size: 24px;
+}
+.clock-colon {
+  margin: 0 2px;
+}

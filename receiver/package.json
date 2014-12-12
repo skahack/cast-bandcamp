@@ -1,0 +1,31 @@
+{
+  "name": "cast-bandcamp-receiver",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "browserify js/receiver.js > build/index.js",
+    "build-css": "cd css && duo -o ../build index.css",
+    "deploy": "cp index.html build && cp -rf build/* ~/Dropbox/Public/chromecast/bandcamp/"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "debug": "^2.1.0",
+    "moment": "^2.8.4",
+    "object-assign": "^2.0.0",
+    "react": "^0.12.1",
+    "sprintf-js": "^1.0.2",
+    "superagent": "^0.21.0"
+  },
+  "devDependencies": {
+    "browserify": "^7.0.0",
+    "duo": "^0.8.10",
+    "reactify": "^0.17.1"
+  },
+  "browserify": {
+    "transform": [
+      "reactify"
+    ]
+  }
+}
