@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "browserify js/receiver.js > build/index.js",
+    "build": "npm run build-js && npm run build-css && npm run deploy",
+    "build-js": "browserify js/receiver.js > build/index.js",
     "build-css": "cd css && duo -o ../build index.css",
     "deploy": "cp index.html build && cp -rf build/* ~/Dropbox/Public/chromecast/bandcamp/"
   },
