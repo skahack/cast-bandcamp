@@ -33,7 +33,7 @@ Album.prototype = {
 
   url: function(){
     return this.data.url;
-  },
+  }
 };
 
 module.exports = Album;
