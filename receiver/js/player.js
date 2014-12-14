@@ -39,7 +39,7 @@ var Player = assign({}, EventEmitter.prototype, {
         if (status.playerState === 'IDLE' && status.idleReason === 'FINISHED') {
           onFinish();
         }
-        orig(status);
+        return orig(status);
       };
     }());
   },
@@ -66,7 +66,7 @@ var Player = assign({}, EventEmitter.prototype, {
 
     var mediaInfo = new cast.receiver.media.MediaInformation();
     mediaInfo.contentId = _album.track(_trackNum).file();
-    _mediaManager.setMediaInformation(mediaInfo, false);
+    _mediaManager.setMediaInformation(mediaInfo);
 
     _trackNum += 1;
     this.emitChange();
