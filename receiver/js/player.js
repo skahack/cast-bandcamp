@@ -17,8 +17,8 @@ function ended() {
 }
 
 function timeupdate() {
-  _currentTime = music.currentTime;
-  _duration = music.duration;
+  _currentTime = music.currentTime || 0;
+  _duration = music.duration || 0;
   Player.emitUpdateTime();
 }
 
