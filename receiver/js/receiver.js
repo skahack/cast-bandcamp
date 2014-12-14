@@ -8,7 +8,8 @@ var namespace = 'urn:x-cast:com.skahack.cast.bandcamp';
 
 cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 var manager = cast.receiver.CastReceiverManager.getInstance();
-var messageBus = manager.getCastMessageBus(namespace);
+var messageBus = manager.getCastMessageBus(namespace, cast.receiver.CastMessageBus.MessageType.JSON);
+
 debug('Starting Receiver Manager');
 
 manager.onReady = function(e) {
@@ -35,15 +36,21 @@ manager.onSystemVolumeChanged = function(e) {
 
 
 messageBus.onMessage = function(e) {
-  debug('Message [' + e.senderId + ']: ' + e.data);
+  debug('Message [' + e.senderId + ']: ', e.data);
 
-  var album = new Album(JSON.parse(e.data));
-  Player.init(album);
-  Player.play();
+  var message = e.data;
+
+  if (message.command === 'ALBUM') {
+    Player.load(new Album(message.album));
+  }
+  else if (message.command === 'PLAY') {
+    Player.play(message.track);
+  }
 
   messageBus.send(e.senderId, e.data);
 };
 
+Player.init();
 manager.start({statusText: "Application is starting"});
 
 React.render(<Root />, document.getElementById('root'));

@@ -2,6 +2,7 @@ var debug = require('debug')('bandcamp::sender');
 var applicationID = '52FE16A0';
 var namespace = 'urn:x-cast:com.skahack.cast.bandcamp';
 var session = null;
+var mediaSession = null;
 
 window.__onGCastApiAvailable = function(loaded, errorInfo) {
   if (loaded) {
@@ -51,18 +52,23 @@ function onStopAppSuccess() {
 }
 
 function sessionListener(e) {
-  debug('New session ID: ' + e.sessionId);
+  debug('New session: ', e);
   castIconOn();
   session = e;
   session.addUpdateListener(sessionUpdateListener);
+  session.addMessageListener(namespace, onMessage);
+  session.addMediaListener(onMediaDiscovered);
+
+  sendAlbumData();
+
 }
 
 function sessionUpdateListener(isAlive) {
-  update();
   var message = isAlive ? 'Session Updated' : 'Session Removed';
   message += ': ' + session.sessionId;
   debug(message);
   if (!isAlive) {
+    castIconOff();
     session = null;
   }
 }
@@ -76,6 +82,19 @@ function receiverListener(e) {
     debug('receiver found');
   } else {
     debug('receiver list empty');
+  }
+}
+
+function onMediaDiscovered(media) {
+  debug('new media session:', mediaSession);
+  mediaSession = media;
+  mediaSession.addUpdateListener(onMediaStatusUpdate);
+}
+
+function onMediaStatusUpdate(isAlive) {
+  debug('onMediaStatusUpdate');
+  if (!isAlive) {
+    mediaSession = null;
   }
 }
 
@@ -94,8 +113,22 @@ function sendMessage(message) {
   }
 }
 
-function update() {
-  sendMessage(getAlbumData());
+function onMessage(namespace, message) {
+  debug('onMessage: ', namespace, message);
+}
+
+function play() {
+  sendMessage({
+    command: 'PLAY',
+    track: 0,
+  });
+}
+
+function sendAlbumData() {
+  sendMessage({
+    command: 'ALBUM',
+    album: getAlbumData()
+  });
 }
 
 function transcribe(words) {
@@ -112,7 +145,7 @@ function clickCastButton(e) {
       session = e;
     }, onError);
   }
-  update();
+  play();
 }
 
 function castIconOn() {

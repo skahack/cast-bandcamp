@@ -5,16 +5,12 @@ var EventEmitter = require('events').EventEmitter;
 var assign = require('object-assign');
 
 var music;
+var _mediaManager;
 var _album = {};
 var _trackNum = 0;
 var _duration = 0.0;
 var _currentTime = 0.0;
 var _loop = true;
-
-function ended() {
-  debug('ended track');
-  Player.play();
-}
 
 function timeupdate() {
   _currentTime = music.currentTime || 0;
@@ -22,18 +18,41 @@ function timeupdate() {
   Player.emitUpdateTime();
 }
 
+function onFinish() {
+  debug('onFinish');
+  Player.play();
+}
+
 var Player = assign({}, EventEmitter.prototype, {
-  init: function(album){
+  init: function(){
     debug('init player');
-    _album = album;
-    _trackNum = 0;
+
     music = document.getElementById('music');
-    music.removeEventListener('ended', ended, false);
-    music.addEventListener('ended', ended, false);
     music.addEventListener('timeupdate', timeupdate, false);
+
+    _mediaManager = new cast.receiver.MediaManager(music);
+
+    // workaround: Can't play next track when fire ended event.
+    _mediaManager.customizedStatusCallback = (function(){
+      var orig = _mediaManager.customizedStatusCallback.bind(_mediaManager);
+      return function(status){
+        if (status.playerState === 'IDLE' && status.idleReason === 'FINISHED') {
+          onFinish();
+        }
+        orig(status);
+      };
+    }());
   },
 
-  play: function(){
+  load: function(album) {
+    _album = album;
+  },
+
+  play: function(trackNum){
+    if (trackNum !== undefined) {
+      _trackNum = trackNum;
+    }
+
     if (_loop && _album.tracks().length <= _trackNum) {
       _trackNum = 0;
     }
@@ -41,9 +60,13 @@ var Player = assign({}, EventEmitter.prototype, {
     // TODO: check existing a mp3
     // https://riotskarecords.bandcamp.com/album/the-good-old-days
 
-    debug('play music', _trackNum);
-    music.setAttribute('src', _album.track(_trackNum).file());
+    debug('play music: Track No.', _trackNum);
+    music.src = _album.track(_trackNum).file();
     music.play();
+
+    var mediaInfo = new cast.receiver.media.MediaInformation();
+    mediaInfo.contentId = _album.track(_trackNum).file();
+    _mediaManager.setMediaInformation(mediaInfo, false);
 
     _trackNum += 1;
     this.emitChange();
