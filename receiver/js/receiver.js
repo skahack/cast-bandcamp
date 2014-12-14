@@ -17,12 +17,13 @@ manager.onReady = function(e) {
 
 manager.onSenderConnected = function(e) {
   debug('Received Sender Connected event: ' + e.data);
-  debug(window.manager.getSender(e.data).userAgent);
+  debug(window.manager.getSender(e.data));
 };
 
 manager.onSenderDisconnected = function(e) {
   debug('Received Sender Disconnected event: ' + e.data);
-  if (window.manager.getSenders().length === 0) {
+  var reason = cast.receiver.system.DisconnectReason.REQUESTED_BY_SENDER;
+  if (window.manager.getSenders().length === 0 && event.reason === reason) {
     window.close();
   }
 };
