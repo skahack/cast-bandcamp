@@ -1,159 +1,32 @@
 var debug = require('debug')('bandcamp::sender');
-var applicationID = '52FE16A0';
-var namespace = 'urn:x-cast:com.skahack.cast.bandcamp';
-var session = null;
-var mediaSession = null;
+var React = require('react');
+var Player = require('./components/player');
+var TrackStatus = require('./components/track-status');
+var Cast = require('./utils/cast');
 
 window.__onGCastApiAvailable = function(loaded, errorInfo) {
   if (loaded) {
-    initializeCastApi();
+    Cast.init();
   } else {
     debug(errorInfo);
   }
 };
 
-function initializeCastApi() {
-  debug('initializeCastApi');
-  var sessionRequest = new chrome.cast.SessionRequest(applicationID);
-  var apiConfig = new chrome.cast.ApiConfig(sessionRequest,
-      sessionListener,
-      receiverListener);
-  chrome.cast.initialize(apiConfig, onInitSuccess, onError);
-}
+var el = document.createElement('div');
+el.className = "inline_player chromecast";
+$('.inline_player.desktop-view').before(el);
 
-function onInitSuccess() {
-  debug('init success');
+React.render(<Player />, el);
 
-  var divStyle = "position: absolute;top: -11px;right: -4px;cursor: pointer;background: #fff;";
+$('#track_table .track_row_view').each(function(){
+  var trackNum = parseInt($(this).attr('rel').replace(/tracknum=/, '')) - 1;
 
-  $('.inline_player.desktop-view')
-    .prepend('<div class="cast-bandcamp" style="'+divStyle+'"><img style="width: 36px;"/></div>');
+  var el = document.createElement('td');
+  el.className = "cast-play-col";
+  React.render(<TrackStatus trackNum={trackNum} />, el);
 
-  if (session === null) {
-    castIconOff();
-  } else {
-    castIconOn();
-  }
+  var $el = $(el);
+  $el.hide();
 
-  $('.cast-bandcamp').on('click', clickCastButton);
-}
-
-function onSuccess(message) {
-  debug("onSuccess", message);
-}
-
-function onError(message) {
-  debug("onError", message);
-  castIconOff();
-}
-
-function onStopAppSuccess() {
-  debug('onStopAppSuccess');
-}
-
-function sessionListener(e) {
-  debug('New session: ', e);
-  castIconOn();
-  session = e;
-  session.addUpdateListener(sessionUpdateListener);
-  session.addMessageListener(namespace, onMessage);
-  session.addMediaListener(onMediaDiscovered);
-
-  sendAlbumData();
-
-}
-
-function sessionUpdateListener(isAlive) {
-  var message = isAlive ? 'Session Updated' : 'Session Removed';
-  message += ': ' + session.sessionId;
-  debug(message);
-  if (!isAlive) {
-    castIconOff();
-    session = null;
-  }
-}
-
-function receiverMessage(namespace, message) {
-  debug("receiverMessage: "+namespace+", "+message);
-}
-
-function receiverListener(e) {
-  if (e === 'available') {
-    debug('receiver found');
-  } else {
-    debug('receiver list empty');
-  }
-}
-
-function onMediaDiscovered(media) {
-  debug('new media session:', mediaSession);
-  mediaSession = media;
-  mediaSession.addUpdateListener(onMediaStatusUpdate);
-}
-
-function onMediaStatusUpdate(isAlive) {
-  debug('onMediaStatusUpdate');
-  if (!isAlive) {
-    mediaSession = null;
-  }
-}
-
-function stopApp() {
-  session.stop(onStopAppSuccess, onError);
-}
-
-function sendMessage(message) {
-  if (session !== null) {
-    session.sendMessage(namespace, message, onSuccess.bind(this, "Message sent: " + message), onError);
-  } else {
-    chrome.cast.requestSession(function(e) {
-      session = e;
-      session.sendMessage(namespace, message, onSuccess.bind(this, "Message sent: " + message), onError);
-    }, onError);
-  }
-}
-
-function onMessage(namespace, message) {
-  debug('onMessage: ', namespace, message);
-}
-
-function play() {
-  sendMessage({
-    command: 'PLAY',
-    track: 0,
-  });
-}
-
-function sendAlbumData() {
-  sendMessage({
-    command: 'ALBUM',
-    album: getAlbumData()
-  });
-}
-
-function transcribe(words) {
-  sendMessage(words);
-}
-
-function getAlbumData() {
-  return TralbumData;
-}
-
-function clickCastButton(e) {
-  if (session === null) {
-    chrome.cast.requestSession(function(e){
-      session = e;
-    }, onError);
-  }
-  play();
-}
-
-function castIconOn() {
-  var image = castBandcamp + 'cast_on.png';
-  $('.cast-bandcamp img').attr('src', image);
-}
-
-function castIconOff() {
-  var image = castBandcamp + 'cast_off.png';
-  $('.cast-bandcamp img').attr('src', image);
-}
+  $(this).prepend($el);
+});
