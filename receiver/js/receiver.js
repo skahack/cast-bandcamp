@@ -46,6 +46,9 @@ messageBus.onMessage = function(e) {
   else if (message.command === 'PLAY') {
     Player.play(message.track);
   }
+  else if (message.command === 'PAUSE') {
+    Player.pause();
+  }
 
   messageBus.send(e.senderId, e.data);
 };

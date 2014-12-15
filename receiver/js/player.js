@@ -18,6 +18,24 @@ function timeupdate() {
   Player.emitUpdateTime();
 }
 
+function loadedmetadata() {
+  debug('loadedmetadata');
+
+  var mediaInfo = new cast.receiver.media.MediaInformation();
+
+  var track = _album.track(_trackNum - 1);
+  mediaInfo.contentId = track.file();
+  mediaInfo.duration = music.duration;
+  mediaInfo.metadata = {
+    title: track.title(),
+    num: track.num()
+  };
+  _mediaManager.setMediaInformation(mediaInfo, false);
+
+  _mediaManager.broadcastStatus(true);
+  music.play();
+}
+
 function onFinish() {
   debug('onFinish');
   Player.play();
@@ -29,6 +47,7 @@ var Player = assign({}, EventEmitter.prototype, {
 
     music = document.getElementById('music');
     music.addEventListener('timeupdate', timeupdate, false);
+    music.addEventListener('loadedmetadata', loadedmetadata, false);
 
     _mediaManager = new cast.receiver.MediaManager(music);
 
@@ -49,6 +68,8 @@ var Player = assign({}, EventEmitter.prototype, {
   },
 
   play: function(trackNum){
+    var currentTrackNum = _trackNum - 1;
+
     if (trackNum !== undefined) {
       _trackNum = trackNum;
     }
@@ -63,16 +84,12 @@ var Player = assign({}, EventEmitter.prototype, {
     var track = _album.track(_trackNum);
     debug('play music: Track No.', _trackNum);
 
-    music.src = track.file();
-    music.play();
-
-    var mediaInfo = new cast.receiver.media.MediaInformation();
-    mediaInfo.contentId = track.file();
-    mediaInfo.metadata = {
-      title: track.title(),
-      num: track.num()
-    };
-    _mediaManager.setMediaInformation(mediaInfo);
+    if (_trackNum !== currentTrackNum) {
+      music.src = track.file();
+      music.load();
+    } else {
+      music.play();
+    }
 
     _trackNum += 1;
     this.emitChange();

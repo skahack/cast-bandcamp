@@ -1,8 +1,8 @@
 var debug = require('debug')('bandcamp::sender');
 var React = require('react');
+var Cast = require('./utils/cast');
 var Player = require('./components/player');
 var TrackStatus = require('./components/track-status');
-var Cast = require('./utils/cast');
 
 window.__onGCastApiAvailable = function(loaded, errorInfo) {
   if (loaded) {

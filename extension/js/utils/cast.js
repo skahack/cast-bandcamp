@@ -1,12 +1,16 @@
 var debug = require('debug')('bandcamp:stores:cast');
 var React = require('react');
+var EventEmitter = require('events').EventEmitter;
+var assign = require('object-assign');
 
 var applicationID = '52FE16A0';
 var namespace = 'urn:x-cast:com.skahack.cast.bandcamp';
 var session = null;
 var mediaSession = null;
 
-var Cast = {};
+window.session = session;
+
+var Cast = assign({}, EventEmitter.prototype);
 
 Cast.init = function(){
   debug('initializeCastApi');
@@ -20,6 +24,10 @@ Cast.init = function(){
 Cast.play = function(trackNum){
   trackNum = trackNum || 0;
   play(trackNum);
+};
+
+Cast.pause = function(){
+  pause();
 };
 
 function onInitSuccess() {
@@ -55,6 +63,10 @@ function sessionListener(e) {
   session.addMessageListener(namespace, onMessage);
   session.addMediaListener(onMediaDiscovered);
 
+  if (session.media.length > 0) {
+    Cast.emit('STATUS_UPDATE', session.media[0]);
+  }
+
   sendAlbumData();
 }
 
@@ -88,6 +100,9 @@ function onMediaDiscovered(media) {
 
 function onMediaStatusUpdate(isAlive) {
   debug('onMediaStatusUpdate', isAlive);
+  if (session.media.length > 0) {
+    Cast.emit('STATUS_UPDATE', session.media[0]);
+  }
   if (!isAlive) {
     mediaSession = null;
   }
@@ -117,6 +132,17 @@ function play(trackNum) {
     command: 'PLAY',
     track: trackNum,
   });
+  Cast.emit('PLAY');
+}
+
+function pause() {
+  if (session.media.length === 0) {
+    return;
+  }
+  var request = new chrome.cast.media.PauseRequest();
+  session.media[0].pause(request, onSuccess, onError);
+
+  Cast.emit('PLAYER_PAUSED');
 }
 
 function sendAlbumData() {

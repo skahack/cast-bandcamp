@@ -1,22 +1,42 @@
 var debug = require('debug')('bandcamp:components:player');
+var sprintf = require("sprintf-js").sprintf;
 var React = require('react');
 var PlayerAction = require('../actions/player');
+var PlayerStore = require('../stores/player');
 
 var Player = React.createClass({
-  // getInitialState: function(){
-  //   return getState();
-  // },
+  timer: null,
 
-  componentDidMount: function(){},
-  componentWillUnmount: function(){},
+  getInitialState: function(){
+    return {
+      playerState: '',
+      title: '',
+      currentTime: 0.0,
+      duration: 0.0
+    };
+  },
+
+  componentDidMount: function(){
+    PlayerStore.on('CHANGE', this.onChange);
+    PlayerStore.on('TRACK_CHANGE', this.onTrackChange);
+  },
+
+  componentWillUnmount: function(){
+    PlayerStore.removeListener('CHANGE', this.onChange);
+    PlayerStore.removeListener('TRACK_CHANGE', this.onTrackChange);
+  },
 
   render: function(){
-    var title = 'Title';
+    var title = this.state.title;
     var url = '/';
-    var currentTime = '00:00';
-    var duration = '01:00';
+    var currentTime = this.getCurrentTime();
+    var duration = this.getDuration();
+    var playButtonClass = ['playbutton'];
+    if (this.state.playerState === 'PLAYING') {
+      playButtonClass.push('playing');
+    }
     var progressStyle = {
-      left: '0px',
+      left: this.getCurrentPosition() + 'px',
       top: '-2px'
     };
     var divStyle = {
@@ -38,7 +58,7 @@ var Player = React.createClass({
         <tbody>
         <tr>
           <td className="play_cell" rowSpan="2">
-            <a onClick={this.play}><div className="playbutton"></div></a>
+            <a onClick={this.onClickPlay}><div className={playButtonClass.join(' ')}></div></a>
           </td>
           <td className="track_cell" colSpan="3">
             <div className="track_info">
@@ -77,8 +97,85 @@ var Player = React.createClass({
     )
   },
 
-  play: function(e){
-    PlayerAction.play();
+  onClickPlay: function(e){
+    if (this.state.playerState === 'PLAYING') {
+      PlayerAction.pause();
+    } else {
+      var trackNum = PlayerStore.getTrackNum();
+      if (trackNum < 0) {
+        trackNum = 0;
+      }
+      PlayerAction.play(trackNum);
+    }
+  },
+
+  getDuration: function(){
+    var duration = this.state.duration || 0.0;
+    var m = Math.floor(duration / 60);
+    var s = Math.floor(duration % 60);
+    return sprintf('%02d:%02d', m, s);
+  },
+
+  getCurrentTime: function(){
+    var currentTime = this.state.currentTime || 0.0;
+    var m = Math.floor(currentTime / 60);
+    var s = Math.floor(currentTime % 60);
+    return sprintf('%02d:%02d', m, s);
+  },
+
+  getCurrentPosition: function(){
+    var max = 225;
+    var duration = this.state.duration || 0.0;
+    var currentTime = this.state.currentTime || 0.0;
+
+    return 225 * ( currentTime / duration );
+  },
+
+  progressInit: function(){
+    this.clearTimer();
+
+    this.progressStart();
+  },
+
+  progressStart: function(){
+    if (this.state.currentTime >= this.state.duration) {
+      this.clearTimer();
+      return;
+    }
+    this.timer = setTimeout(this.progressStart, 1000);
+    PlayerAction.updateCurrentTime(this.state.currentTime + 1);
+  },
+
+  clearTimer: function(){
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+  },
+
+  onChange: function(){
+    if (PlayerStore.getPlayerState() === 'PAUSED') {
+      this.clearTimer();
+    }
+    else if (PlayerStore.getPlayerState() === 'PLAYING' && this.timer === null) {
+      this.progressInit();
+    }
+    this.setState(this.getState());
+  },
+
+  onTrackChange: function(){
+    this.setState(this.getState());
+
+    this.progressInit();
+  },
+
+  getState: function(){
+    return {
+      playerState: PlayerStore.getPlayerState(),
+      title: PlayerStore.getTitle(),
+      currentTime: PlayerStore.getCurrentTime(),
+      duration: PlayerStore.getDuration()
+    };
   }
 });
 

@@ -10,7 +10,9 @@
   "license": "MIT",
   "dependencies": {
     "debug": "^2.1.0",
-    "react": "^0.12.1"
+    "object-assign": "^2.0.0",
+    "react": "^0.12.1",
+    "sprintf-js": "^1.0.2"
   },
   "devDependencies": {
     "browserify": "^7.0.0",
