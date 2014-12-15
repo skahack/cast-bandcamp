@@ -60,12 +60,18 @@ var Player = assign({}, EventEmitter.prototype, {
     // TODO: check existing a mp3
     // https://riotskarecords.bandcamp.com/album/the-good-old-days
 
+    var track = _album.track(_trackNum);
     debug('play music: Track No.', _trackNum);
-    music.src = _album.track(_trackNum).file();
+
+    music.src = track.file();
     music.play();
 
     var mediaInfo = new cast.receiver.media.MediaInformation();
-    mediaInfo.contentId = _album.track(_trackNum).file();
+    mediaInfo.contentId = track.file();
+    mediaInfo.metadata = {
+      title: track.title(),
+      num: track.num()
+    };
     _mediaManager.setMediaInformation(mediaInfo);
 
     _trackNum += 1;
