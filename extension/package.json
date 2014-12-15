@@ -4,9 +4,10 @@
   "description": "sender extension",
   "main": "index.js",
   "scripts": {
+    "deploy": "npm run build && mkdir build && cp *.png build && cp *.js build && cp *.json build && zip build.zip build/* && rm -rf build",
     "build": "browserify js/sender.js > sender.js"
   },
-  "author": "",
+  "author": "Hiroki Sato",
   "license": "MIT",
   "dependencies": {
     "debug": "^2.1.0",
