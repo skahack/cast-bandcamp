@@ -17,7 +17,7 @@ function injectResourceURL() {
     .appendChild(script);
 }
 
+injectResourceURL(url);
 injectScript('https://www.gstatic.com/cv/js/sender/v1/cast_sender.js');
 var url = chrome.extension.getURL('sender.js');
 injectScript(url);
-injectResourceURL(url);

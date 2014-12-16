@@ -30,3 +30,16 @@ $('#track_table .track_row_view').each(function(){
 
   $(this).prepend($el);
 });
+
+var style = [
+  'position: absolute;',
+  'width: 36px;',
+  'top: 16px;',
+  'left: 342px;',
+  'cursor: pointer;',
+  'background: #fff;',
+  'z-index: 999;'
+];
+var $el = $('<div style="position:relative"><img class="cast-bandcamp" style="'+style.join('')+'"></div>');
+$('#name-section').append($el);
+

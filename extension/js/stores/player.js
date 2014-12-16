@@ -10,6 +10,8 @@ _currentTime = 0.0;
 
 var PlayerStore = assign({}, EventEmitter.prototype);
 
+PlayerStore.setMaxListeners(55);
+
 PlayerStore.getPlayerState = function(){
   return _playerState;
 };
@@ -42,23 +44,23 @@ PlayerAction.on('STATUS_UPDATE', function(media){
     _duration = media.media.duration;
     _currentTime = media.currentTime;
 
-    PlayerStore.emit('TRACK_CHANGE');
+    PlayerStore.emit('CHANGE', 'TRACK_CHANGE');
   }
 });
 
 PlayerAction.on('CURRENT_TIME_UPDATE', function(sec){
   _currentTime = sec;
-  PlayerStore.emit('CHANGE');
+  PlayerStore.emit('CHANGE', 'CURRENT_TIME_UPDATE');
 });
 
 PlayerAction.on('PLAYER_PAUSED', function(){
   _playerState = 'PAUSED';
-  PlayerStore.emit('CHANGE');
+  PlayerStore.emit('CHANGE', 'PAUSED');
 });
 
 PlayerAction.on('PLAY', function(){
   _playerState = 'PLAYING';
-  PlayerStore.emit('CHANGE');
+  PlayerStore.emit('CHANGE', 'PLAY');
 });
 
 module.exports = PlayerStore;

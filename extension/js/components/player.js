@@ -18,12 +18,10 @@ var Player = React.createClass({
 
   componentDidMount: function(){
     PlayerStore.on('CHANGE', this.onChange);
-    PlayerStore.on('TRACK_CHANGE', this.onTrackChange);
   },
 
   componentWillUnmount: function(){
     PlayerStore.removeListener('CHANGE', this.onChange);
-    PlayerStore.removeListener('TRACK_CHANGE', this.onTrackChange);
   },
 
   render: function(){
@@ -39,61 +37,48 @@ var Player = React.createClass({
       left: this.getCurrentPosition() + 'px',
       top: '-2px'
     };
-    var divStyle = {
-      position: 'absolute',
-      top: '-11px',
-      right: '-4px',
-      cursor: 'pointer',
-      background: '#fff'
-    };
-    var imgStyle = { width: '36px' };
     var progressBarStyle = { width: '0%' };
 
     return (
-      <div>
-        <div className="cast-bandcamp" style={divStyle}>
-          <img style={imgStyle} />
-        </div>
-        <table>
-        <tbody>
-        <tr>
-          <td className="play_cell" rowSpan="2">
-            <a onClick={this.onClickPlay}><div className={playButtonClass.join(' ')}></div></a>
-          </td>
-          <td className="track_cell" colSpan="3">
-            <div className="track_info">
-              <span className="title-section">
-                <a className="title_link primaryText" href={url}>
-                  <span className="title">{title}</span>
-                </a>
-              </span>
-              <span className="time secondaryText">
-                <span className="time_elapsed">{currentTime}</span>
-                <span> / </span>
-                <span className="time_total">{duration}</span>
-              </span>
+      <table>
+      <tbody>
+      <tr>
+        <td className="play_cell" rowSpan="2">
+          <a onClick={this.onClickPlay}><div className={playButtonClass.join(' ')}></div></a>
+        </td>
+        <td className="track_cell" colSpan="3">
+          <div className="track_info">
+            <span className="title-section">
+              <a className="title_link primaryText" href={url}>
+                <span className="title">{title}</span>
+              </a>
+            </span>
+            <span className="time secondaryText">
+              <span className="time_elapsed">{currentTime}</span>
+              <span> / </span>
+              <span className="time_total">{duration}</span>
+            </span>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td className="progbar_cell">
+          <div className="progbar">
+            <div className="progbar_empty">
+              <div className="progbar_fill" style={progressBarStyle}></div>
+              <div className="thumb" id="yui-gen0" style={progressStyle}></div>
             </div>
-          </td>
-        </tr>
-        <tr>
-          <td className="progbar_cell">
-            <div className="progbar">
-              <div className="progbar_empty">
-                <div className="progbar_fill" style={progressBarStyle}></div>
-                <div className="thumb" id="yui-gen0" style={progressStyle}></div>
-              </div>
-            </div>
-          </td>
-          <td className="prev_cell">
-            <a><div className="prevbutton"></div></a>
-          </td>
-          <td className="next_cell">
-            <a><div className="nextbutton"></div></a>
-          </td>
-        </tr>
-        </tbody>
-        </table>
-      </div>
+          </div>
+        </td>
+        <td className="prev_cell">
+          <a><div className="prevbutton"></div></a>
+        </td>
+        <td className="next_cell">
+          <a><div className="nextbutton"></div></a>
+        </td>
+      </tr>
+      </tbody>
+      </table>
     )
   },
 
@@ -138,7 +123,9 @@ var Player = React.createClass({
   },
 
   progressStart: function(){
-    if (this.state.currentTime >= this.state.duration) {
+    var currentTime = PlayerStore.getCurrentTime();
+    var duration = PlayerStore.getDuration();
+    if (currentTime >= duration) {
       this.clearTimer();
       return;
     }
@@ -153,20 +140,15 @@ var Player = React.createClass({
     }
   },
 
-  onChange: function(){
-    if (PlayerStore.getPlayerState() === 'PAUSED') {
-      this.clearTimer();
-    }
-    else if (PlayerStore.getPlayerState() === 'PLAYING' && this.timer === null) {
+  onChange: function(state){
+    if (state === 'TRACK_CHANGE' || (state === 'PLAY' && this.timer === null)) {
       this.progressInit();
     }
-    this.setState(this.getState());
-  },
+    else if (state === 'PAUSED') {
+      this.clearTimer();
+    }
 
-  onTrackChange: function(){
     this.setState(this.getState());
-
-    this.progressInit();
   },
 
   getState: function(){

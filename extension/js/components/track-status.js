@@ -11,13 +11,11 @@ var Status = React.createClass({
   },
 
   componentDidMount: function(){
-    PlayerStore.on('CHANGE', this.onTrackChange);
-    PlayerStore.on('TRACK_CHANGE', this.onTrackChange);
+    PlayerStore.on('CHANGE', this.onChange);
   },
 
   componentWillUnmount: function(){
-    PlayerStore.removeListener('CHANGE', this.onTrackChange);
-    PlayerStore.removeListener('TRACK_CHANGE', this.onTrackChange);
+    PlayerStore.removeListener('CHANGE', this.onChange);
   },
 
   render: function(){
@@ -32,7 +30,7 @@ var Status = React.createClass({
     )
   },
 
-  onTrackChange: function(){
+  onChange: function(state){
     var trackNum = PlayerStore.getTrackNum();
     var playerState = PlayerStore.getPlayerState();
 

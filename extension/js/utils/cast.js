@@ -63,11 +63,14 @@ function sessionListener(e) {
   session.addMessageListener(namespace, onMessage);
   session.addMediaListener(onMediaDiscovered);
 
+
   if (session.media.length > 0) {
     Cast.emit('STATUS_UPDATE', session.media[0]);
   }
-
-  sendAlbumData();
+  else {
+    sendAlbumData();
+    Cast.play();
+  }
 }
 
 function sessionUpdateListener(isAlive) {
@@ -163,14 +166,14 @@ function getAlbumData() {
 function clickCastButton(e) {
   if (session === null) {
     chrome.cast.requestSession(function(e){
-      session = e;
+      sessionListener(e);
     }, onError);
   }
 }
 
 function castIconOn() {
   var image = castBandcamp + 'cast_on.png';
-  $('.cast-bandcamp img').attr('src', image);
+  $('.cast-bandcamp').attr('src', image);
 
   $('.inline_player.desktop-view').hide();
   $('.inline_player.chromecast').show();
@@ -181,7 +184,7 @@ function castIconOn() {
 
 function castIconOff() {
   var image = castBandcamp + 'cast_off.png';
-  $('.cast-bandcamp img').attr('src', image);
+  $('.cast-bandcamp').attr('src', image);
 
   $('.inline_player.desktop-view').show();
   $('.inline_player.chromecast').hide();
