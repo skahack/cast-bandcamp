@@ -3,7 +3,7 @@
 
   "name": "Bandcast",
   "description": "Bandcamp player on a Chromecast",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Hiroki Sato",
 
   "content_scripts": [{
