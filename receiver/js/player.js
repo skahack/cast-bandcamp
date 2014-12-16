@@ -1,4 +1,5 @@
 var debug = require('debug')('bandcamp::player');
+var Analytics = require('./analytics.js');
 var sprintf = require("sprintf-js").sprintf;
 var Track = require('./track');
 var EventEmitter = require('events').EventEmitter;
@@ -39,6 +40,14 @@ function loadedmetadata() {
 function onFinish() {
   debug('onFinish');
   Player.play();
+
+
+  var desc = _album.artist() + ' / ' + _album.title();
+  Analytics.sendEvent('player', 'track ended', desc, _trackNum - 1, {
+    nonInteraction: 1,
+    trackNum: _trackNum - 1,
+    utl: _album.url()
+  });
 }
 
 var Player = assign({}, EventEmitter.prototype, {
@@ -69,6 +78,7 @@ var Player = assign({}, EventEmitter.prototype, {
 
   play: function(trackNum){
     var currentTrackNum = _trackNum - 1;
+    var desc = _album.artist() + ' / ' + _album.title();
 
     if (trackNum !== undefined) {
       _trackNum = trackNum;
@@ -76,6 +86,12 @@ var Player = assign({}, EventEmitter.prototype, {
 
     if (_loop && _album.tracks().length <= _trackNum) {
       _trackNum = 0;
+
+      Analytics.sendEvent('player', 'loop', desc, _trackNum + 1, {
+        nonInteraction: 1,
+        trackNum: _trackNum + 1,
+        utl: _album.url()
+      });
     }
 
     // TODO: check existing a mp3
@@ -93,6 +109,11 @@ var Player = assign({}, EventEmitter.prototype, {
 
     _trackNum += 1;
     this.emitChange();
+
+    Analytics.sendEvent('player', 'play', desc, _trackNum, {
+      trackNum: _trackNum,
+      utl: _album.url()
+    });
   },
 
   emitChange: function(){
