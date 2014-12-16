@@ -32,7 +32,7 @@ function getSeparatedTrackDOMs(trackDOMs, currentTrack) {
 
   for (var i = 0; i < trackDOMs.length; i++) {
     var classNames = ['tracks'];
-    var currentRow = Math.floor(currentTrack.num() / _separateNum);
+    var currentRow = Math.floor((currentTrack.num() - 1) / _separateNum) + 1;
     if (currentRow % 2 === 0) {
       currentRow -= 1;
     }
