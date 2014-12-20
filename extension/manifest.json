@@ -2,7 +2,7 @@
   "manifest_version": 2,
 
   "name": "Bandcast",
-  "description": "Bandcamp player on a Chromecast",
+  "description": "Listen to Bandcamp music on your TV via Chromecast",
   "version": "0.0.2",
   "author": "Hiroki Sato",
 
