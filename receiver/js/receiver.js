@@ -50,7 +50,6 @@ messageBus.onMessage = function(e) {
   messageBus.send(e.senderId, e.data);
 };
 
-Player.init();
 manager.start({statusText: "Application is starting"});
 
 React.render(<Root />, document.getElementById('root'));

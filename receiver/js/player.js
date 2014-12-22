@@ -13,6 +13,27 @@ var _duration = 0.0;
 var _currentTime = 0.0;
 var _loop = true;
 
+function init() {
+  debug('init player');
+
+  _music = document.getElementById('music');
+  _music.addEventListener('timeupdate', timeupdate, false);
+  _music.addEventListener('loadedmetadata', loadedmetadata, false);
+
+  _mediaManager = new cast.receiver.MediaManager(_music);
+
+  // workaround: Can't play next track when fire ended event.
+  _mediaManager.customizedStatusCallback = (function(){
+    var orig = _mediaManager.customizedStatusCallback.bind(_mediaManager);
+    return function(status){
+      if (status.playerState === 'IDLE' && status.idleReason === 'FINISHED') {
+        onFinish();
+      }
+      return orig(status);
+    };
+  }());
+}
+
 function timeupdate() {
   _currentTime = _music.currentTime || 0;
   _duration = _music.duration || 0;
@@ -50,26 +71,6 @@ function onFinish() {
 }
 
 var Player = assign({}, EventEmitter.prototype, {
-  init: function(){
-    debug('init player');
-
-    _music = document.getElementById('music');
-    _music.addEventListener('timeupdate', timeupdate, false);
-    _music.addEventListener('loadedmetadata', loadedmetadata, false);
-
-    _mediaManager = new cast.receiver.MediaManager(_music);
-
-    // workaround: Can't play next track when fire ended event.
-    _mediaManager.customizedStatusCallback = (function(){
-      var orig = _mediaManager.customizedStatusCallback.bind(_mediaManager);
-      return function(status){
-        if (status.playerState === 'IDLE' && status.idleReason === 'FINISHED') {
-          onFinish();
-        }
-        return orig(status);
-      };
-    }());
-  },
 
   load: function(album) {
     _album = album;
@@ -172,5 +173,7 @@ var Player = assign({}, EventEmitter.prototype, {
     return (_currentTime / _duration) * 100;
   }
 });
+
+init();
 
 module.exports = Player;
