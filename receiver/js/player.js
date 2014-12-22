@@ -5,17 +5,17 @@ var Track = require('./track');
 var EventEmitter = require('events').EventEmitter;
 var assign = require('object-assign');
 
-var music;
+var _music;
 var _mediaManager;
 var _album = {};
-var _trackNum = 0;
+var _trackNum = -1;
 var _duration = 0.0;
 var _currentTime = 0.0;
 var _loop = true;
 
 function timeupdate() {
-  _currentTime = music.currentTime || 0;
-  _duration = music.duration || 0;
+  _currentTime = _music.currentTime || 0;
+  _duration = _music.duration || 0;
   Player.emitUpdateTime();
 }
 
@@ -24,9 +24,9 @@ function loadedmetadata() {
 
   var mediaInfo = new cast.receiver.media.MediaInformation();
 
-  var track = _album.track(_trackNum - 1);
+  var track = _album.track(_trackNum);
   mediaInfo.contentId = track.file();
-  mediaInfo.duration = music.duration;
+  mediaInfo.duration = _music.duration;
   mediaInfo.metadata = {
     title: track.title(),
     num: track.num()
@@ -34,18 +34,17 @@ function loadedmetadata() {
   _mediaManager.setMediaInformation(mediaInfo, false);
 
   _mediaManager.broadcastStatus(true);
-  music.play();
+  _music.play();
 }
 
 function onFinish() {
   debug('onFinish');
-  Player.play();
-
+  Player.playNext();
 
   var desc = _album.artist() + ' / ' + _album.title();
-  Analytics.sendEvent('player', 'track ended', desc, _trackNum - 1, {
+  Analytics.sendEvent('player', 'track ended', desc, _trackNum + 1, {
     nonInteraction: 1,
-    trackNum: _trackNum - 1,
+    trackNum: _trackNum + 1,
     utl: _album.url()
   });
 }
@@ -54,11 +53,11 @@ var Player = assign({}, EventEmitter.prototype, {
   init: function(){
     debug('init player');
 
-    music = document.getElementById('music');
-    music.addEventListener('timeupdate', timeupdate, false);
-    music.addEventListener('loadedmetadata', loadedmetadata, false);
+    _music = document.getElementById('music');
+    _music.addEventListener('timeupdate', timeupdate, false);
+    _music.addEventListener('loadedmetadata', loadedmetadata, false);
 
-    _mediaManager = new cast.receiver.MediaManager(music);
+    _mediaManager = new cast.receiver.MediaManager(_music);
 
     // workaround: Can't play next track when fire ended event.
     _mediaManager.customizedStatusCallback = (function(){
@@ -77,7 +76,7 @@ var Player = assign({}, EventEmitter.prototype, {
   },
 
   play: function(trackNum){
-    var currentTrackNum = _trackNum - 1;
+    var currentTrackNum = _trackNum;
     var desc = _album.artist() + ' / ' + _album.title();
 
     if (trackNum !== undefined) {
@@ -101,19 +100,22 @@ var Player = assign({}, EventEmitter.prototype, {
     debug('play music: Track No.', _trackNum);
 
     if (_trackNum !== currentTrackNum) {
-      music.src = track.file();
-      music.load();
+      _music.src = track.file();
+      _music.load();
     } else {
-      music.play();
+      _music.play();
     }
 
-    _trackNum += 1;
     this.emitChange();
 
-    Analytics.sendEvent('player', 'play', desc, _trackNum, {
-      trackNum: _trackNum,
+    Analytics.sendEvent('player', 'play', desc, _trackNum + 1, {
+      trackNum: _trackNum + 1,
       utl: _album.url()
     });
+  },
+
+  playNext: function(){
+    this.play(_trackNum + 1);
   },
 
   emitChange: function(){
@@ -149,7 +151,7 @@ var Player = assign({}, EventEmitter.prototype, {
 
   getCurrentTrack: function(){
     if (_album.track) {
-      return _album.track(_trackNum - 1);
+      return _album.track(_trackNum);
     }
     return new Track();
   },
