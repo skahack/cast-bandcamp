@@ -4,7 +4,7 @@
   "description": "sender extension",
   "main": "index.js",
   "scripts": {
-    "deploy": "NODE_ENV=production npm run build && npm run package",
+    "deploy": "NODE_ENV=production APP_ID=52FE16A0 npm run build && npm run package",
     "deploy-dev": "NODE_ENV=development npm run build && npm run package",
     "build": "browserify js/sender.js > sender.js",
     "package": "mkdir build && cp *.png build && cp *.js build && cp *.json build && zip build.zip build/* && rm -rf build"

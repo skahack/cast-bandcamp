@@ -2,8 +2,7 @@ var debug = require('debug')('bandcamp:stores:cast');
 var React = require('react');
 var EventEmitter = require('events').EventEmitter;
 var assign = require('object-assign');
-
-var applicationID = '52FE16A0';
+var applicationID = process.env.APP_ID;
 var namespace = 'urn:x-cast:com.skahack.cast.bandcamp';
 var session = null;
 var mediaSession = null;
