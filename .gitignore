@@ -30,3 +30,4 @@ receiver/css/components
 receiver/build
 extension/sender.js
 build.zip
+.local*
