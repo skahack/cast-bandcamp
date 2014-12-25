@@ -2,12 +2,14 @@ var debug = require('debug')('bandcamp::player');
 var Analytics = require('./analytics.js');
 var sprintf = require("sprintf-js").sprintf;
 var Track = require('./track');
+var Album = require('./album');
 var EventEmitter = require('events').EventEmitter;
 var assign = require('object-assign');
 
 var _music;
 var _mediaManager;
-var _album = {};
+var _albums = {};
+var _currentAlbum = new Album();
 var _trackNum = -1;
 var _duration = 0.0;
 var _currentTime = 0.0;
@@ -45,12 +47,15 @@ function loadedmetadata() {
 
   var mediaInfo = new cast.receiver.media.MediaInformation();
 
-  var track = _album.track(_trackNum);
+  var album = Player.getAlbum();
+  var track = album.track(_trackNum);
   mediaInfo.contentId = track.file();
   mediaInfo.duration = _music.duration;
   mediaInfo.metadata = {
     title: track.title(),
-    num: track.num()
+    num: track.num(),
+    bandId: album.bandId(),
+    albumId: album.id()
   };
   _mediaManager.setMediaInformation(mediaInfo, false);
 
@@ -62,43 +67,51 @@ function onFinish() {
   debug('onFinish');
   Player.playNext();
 
-  var desc = _album.artist() + ' / ' + _album.title();
+  var desc = Player.getAlbum().artist() + ' / ' + Player.getAlbum().title();
   Analytics.sendEvent('player', 'track ended', desc, _trackNum + 1, {
     nonInteraction: 1,
     trackNum: _trackNum + 1,
-    utl: _album.url()
+    utl: Player.getAlbum().url()
   });
 }
 
 var Player = assign({}, EventEmitter.prototype, {
 
-  load: function(album) {
-    _album = album;
+  load: function(album){
+    if (!_albums[album.bandId()]) {
+      _albums[album.bandId()] = {};
+    }
+    _albums[album.bandId()][album.id()] = album;
   },
 
-  play: function(trackNum){
+  play: function(trackNum, bandId, albumId){
+    debug('play music: Track No.', _trackNum);
+
+    if (bandId !== undefined && albumId !== undefined) {
+      this.setAlbum(bandId, albumId);
+    }
+
     var currentTrackNum = _trackNum;
-    var desc = _album.artist() + ' / ' + _album.title();
+    var desc = this.getAlbum().artist() + ' / ' + this.getAlbum().title();
 
     if (trackNum !== undefined) {
       _trackNum = trackNum;
     }
 
-    if (_loop && _album.tracks().length <= _trackNum) {
+    if (_loop && this.getAlbum().tracks().length <= _trackNum) {
       _trackNum = 0;
 
       Analytics.sendEvent('player', 'loop', desc, _trackNum + 1, {
         nonInteraction: 1,
         trackNum: _trackNum + 1,
-        utl: _album.url()
+        utl: this.getAlbum().url()
       });
     }
 
     // TODO: check existing a mp3
     // https://riotskarecords.bandcamp.com/album/the-good-old-days
 
-    var track = _album.track(_trackNum);
-    debug('play music: Track No.', _trackNum);
+    var track = this.getAlbum().track(_trackNum);
 
     if (_trackNum !== currentTrackNum) {
       _music.src = track.file();
@@ -111,7 +124,7 @@ var Player = assign({}, EventEmitter.prototype, {
 
     Analytics.sendEvent('player', 'play', desc, _trackNum + 1, {
       trackNum: _trackNum + 1,
-      utl: _album.url()
+      utl: this.getAlbum().url()
     });
   },
 
@@ -144,17 +157,35 @@ var Player = assign({}, EventEmitter.prototype, {
   },
 
   getAlbum: function(){
-    if (_album.title) {
-      return _album;
+    if (_currentAlbum.title) {
+      return _currentAlbum;
     }
-    return null;
+    return new Album();
+  },
+
+  setAlbum: function(bandId, albumId){
+    var album = this.getAlbum();
+
+    if (album.bandId() !== bandId || album.id() !== albumId) {
+      var currentAlbum = this.lookupAlbum(bandId, albumId);
+      if (currentAlbum) {
+        _currentAlbum = currentAlbum;
+      }
+    }
   },
 
   getCurrentTrack: function(){
-    if (_album.track) {
-      return _album.track(_trackNum);
+    if (this.getAlbum().track) {
+      return this.getAlbum().track(_trackNum);
     }
     return new Track();
+  },
+
+  lookupAlbum: function(bandId, albumId){
+    if (_albums[bandId] && _albums[bandId][albumId]) {
+      return _albums[bandId][albumId];
+    }
+    return null;
   },
 
   getCurrentDuration: function(){

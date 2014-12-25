@@ -64,7 +64,13 @@ function sessionListener(e) {
 
 
   if (session.media.length > 0) {
-    Cast.emit('STATUS_UPDATE', session.media[0]);
+    var m = session.media[0].media.metadata;
+
+    if (m.bandId === getBandId() && m.albumId === getAlbumId()) {
+      Cast.emit('STATUS_UPDATE', session.media[0]);
+    } else {
+      sendAlbumData();
+    }
   }
   else {
     sendAlbumData();
@@ -133,6 +139,8 @@ function play(trackNum) {
   sendMessage({
     command: 'PLAY',
     track: trackNum,
+    albumId: getAlbumId(),
+    bandId: getBandId()
   });
   Cast.emit('PLAY');
 }
@@ -160,6 +168,14 @@ function transcribe(words) {
 
 function getAlbumData() {
   return TralbumData;
+}
+
+function getBandId() {
+  return String(TralbumData.current.band_id);
+}
+
+function getAlbumId() {
+  return String(TralbumData.current.id);
 }
 
 function clickCastButton(e) {

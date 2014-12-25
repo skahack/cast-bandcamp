@@ -5,7 +5,7 @@ var TrackList = require('./track-list');
 var PlayerView = React.createClass({
   render: function(){
     var album = this.props.album;
-    if (!album) {
+    if (album.isEmpty()) {
       return (<div />);
     }
 

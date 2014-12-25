@@ -44,7 +44,7 @@ messageBus.onMessage = function(e) {
     Player.load(new Album(message.album));
   }
   else if (message.command === 'PLAY') {
-    Player.play(message.track);
+    Player.play(message.track, message.bandId, message.albumId);
   }
 
   messageBus.send(e.senderId, e.data);

@@ -1,13 +1,33 @@
 var Track = require('./track');
 
 function Album(obj) {
-  this.data = obj;
+  this.empty = true;
+  this.data = {
+    artist: '',
+    artFullsizeUrl: '',
+    url: '',
+    current: {
+      id: 0,
+      band_id: 0,
+      title: ''
+    }
+  };
   this._tracks = [];
-  for (var i = 0; i < this.data.trackinfo.length; i++) {
-    this._tracks.push(new Track(this.data.trackinfo[i]));
+
+  if (obj) {
+    this.empty = false;
+    this.data = obj;
+
+    for (var i = 0; i < this.data.trackinfo.length; i++) {
+      this._tracks.push(new Track(this.data.trackinfo[i]));
+    }
   }
 }
 Album.prototype = {
+  isEmpty: function(){
+    return this.empty;
+  },
+
   artist: function(){
     return this.data.artist;
   },
@@ -33,6 +53,14 @@ Album.prototype = {
 
   url: function(){
     return this.data.url;
+  },
+
+  bandId: function(){
+    return String(this.data.current.band_id);
+  },
+
+  id: function(){
+    return String(this.data.current.id);
   }
 };
 
