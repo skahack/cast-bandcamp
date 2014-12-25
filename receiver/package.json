@@ -4,12 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npm run build-js && npm run build-css && npm run deploy",
-    "build-dev": "npm run build-js-dev && npm run build-css && npm run deploy",
-    "build-js": "NODE_ENV=production browserify js/receiver.js > build/index.js",
-    "build-js-dev": "NODE_ENV=development browserify js/receiver.js > build/index.js",
+    "deploy": "NODE_ENV=production npm run build-js && npm run build-css && npm run package",
+    "deploy-dev": "NODE_ENV=development npm run build-js && npm run build-css && npm run package",
+    "build-js": "browserify js/receiver.js > build/index.js",
     "build-css": "cd css && duo -o ../build index.css",
-    "deploy": "cp index.html build && cp -rf build/* ~/Dropbox/Public/chromecast/bandcamp/"
+    "package": "cp index.html build && cp -rf build/* ~/Dropbox/Public/chromecast/bandcamp/"
   },
   "author": "",
   "license": "MIT",

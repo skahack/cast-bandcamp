@@ -4,8 +4,10 @@
   "description": "sender extension",
   "main": "index.js",
   "scripts": {
-    "deploy": "npm run build && mkdir build && cp *.png build && cp *.js build && cp *.json build && zip build.zip build/* && rm -rf build",
-    "build": "browserify js/sender.js > sender.js"
+    "deploy": "NODE_ENV=production npm run build && npm run package",
+    "deploy-dev": "NODE_ENV=development npm run build && npm run package",
+    "build": "browserify js/sender.js > sender.js",
+    "package": "mkdir build && cp *.png build && cp *.js build && cp *.json build && zip build.zip build/* && rm -rf build"
   },
   "author": "Hiroki Sato",
   "license": "MIT",
@@ -17,10 +19,12 @@
   },
   "devDependencies": {
     "browserify": "^7.0.0",
+    "envify": "^3.2.0",
     "reactify": "^0.17.1"
   },
   "browserify": {
     "transform": [
+      "envify",
       "reactify"
     ]
   }
