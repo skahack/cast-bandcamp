@@ -1,6 +1,6 @@
 {
   "name": "cast-bandcamp-extension",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "sender extension",
   "main": "index.js",
   "scripts": {
