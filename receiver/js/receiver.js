@@ -47,7 +47,7 @@ messageBus.onMessage = function(e) {
     Player.play(message.track, message.bandId, message.albumId);
   }
 
-  messageBus.send(e.senderId, e.data);
+  messageBus.send(e.senderId, message.command);
 };
 
 manager.start({statusText: "Application is starting"});
