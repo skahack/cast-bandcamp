@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build": "npm run build-js && npm run build-css && npm run deploy",
-    "build-js": "browserify js/receiver.js > build/index.js",
+    "build-dev": "npm run build-js-dev && npm run build-css && npm run deploy",
+    "build-js": "NODE_ENV=production browserify js/receiver.js > build/index.js",
+    "build-js-dev": "NODE_ENV=development browserify js/receiver.js > build/index.js",
     "build-css": "cd css && duo -o ../build index.css",
     "deploy": "cp index.html build && cp -rf build/* ~/Dropbox/Public/chromecast/bandcamp/"
   },
@@ -21,10 +23,12 @@
   "devDependencies": {
     "browserify": "^7.0.0",
     "duo": "^0.8.10",
+    "envify": "^3.2.0",
     "reactify": "^0.17.1"
   },
   "browserify": {
     "transform": [
+      "envify",
       "reactify"
     ]
   }
