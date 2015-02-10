@@ -87,6 +87,8 @@ var Player = assign({}, EventEmitter.prototype, {
   play: function(trackNum, bandId, albumId){
     debug('play music: Track No.', _trackNum);
 
+    var prevAlbum = this.getAlbum();
+
     if (bandId !== undefined && albumId !== undefined) {
       this.setAlbum(bandId, albumId);
     }
@@ -119,7 +121,8 @@ var Player = assign({}, EventEmitter.prototype, {
       return;
     }
 
-    if (_trackNum !== currentTrackNum) {
+    if (_trackNum !== currentTrackNum ||
+        !prevAlbum.isSameAlbum(bandId, albumId)) {
       _music.src = track.file();
       _music.load();
     } else {

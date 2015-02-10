@@ -59,6 +59,13 @@ Album.prototype = {
     return false;
   },
 
+  isSameAlbum: function(bandId, albumId){
+    if (this.bandId() === bandId && this.id() === albumId) {
+      return true;
+    }
+    return false;
+  },
+
   artwork: function(){
     return this.data.artFullsizeUrl;
   },
