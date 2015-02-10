@@ -20,6 +20,9 @@ var Status = React.createClass({
 
   render: function(){
     var className = ['play_status'];
+    if (this.props.disabled) {
+      className.push('disabled');
+    }
     if (this.state.playing) {
       className.push('playing');
     }

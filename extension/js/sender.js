@@ -20,10 +20,11 @@ React.render(<Player />, el);
 
 $('#track_table .track_row_view').each(function(){
   var trackNum = parseInt($(this).attr('rel').replace(/tracknum=/, '')) - 1;
+  var isDisabled = $(this).find('.play-col .play_status').hasClass('disabled');
 
   var el = document.createElement('td');
   el.className = "cast-play-col";
-  React.render(<TrackStatus trackNum={trackNum} />, el);
+  React.render(<TrackStatus trackNum={trackNum} disabled={isDisabled} />, el);
 
   var $el = $(el);
   $el.hide();
