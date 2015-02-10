@@ -24,6 +24,9 @@ Track.prototype = {
   },
 
   file: function(){
+    if (!this.data.file) {
+      return null;
+    }
     return this.data.file['mp3-128'];
   }
 };

@@ -91,6 +91,10 @@ var Player = assign({}, EventEmitter.prototype, {
       this.setAlbum(bandId, albumId);
     }
 
+    if (!this.getAlbum().hasPlayableFile()) {
+      window.close();
+    }
+
     var currentTrackNum = _trackNum;
     var desc = this.getAlbum().artist() + ' / ' + this.getAlbum().title();
 
@@ -108,10 +112,12 @@ var Player = assign({}, EventEmitter.prototype, {
       });
     }
 
-    // TODO: check existing a mp3
-    // https://riotskarecords.bandcamp.com/album/the-good-old-days
-
     var track = this.getAlbum().track(_trackNum);
+
+    if (!track.file()) {
+      this.playNext();
+      return;
+    }
 
     if (_trackNum !== currentTrackNum) {
       _music.src = track.file();

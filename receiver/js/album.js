@@ -47,6 +47,18 @@ Album.prototype = {
     return new Track();
   },
 
+  hasPlayableFile: function(){
+    var i;
+    var len = this.tracks().length;
+
+    for (i = 0; i < len; i++) {
+      if (this.track(i).file()) {
+        return true;
+      }
+    }
+    return false;
+  },
+
   artwork: function(){
     return this.data.artFullsizeUrl;
   },
