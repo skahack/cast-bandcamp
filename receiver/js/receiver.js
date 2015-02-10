@@ -34,6 +34,17 @@ manager.onSystemVolumeChanged = function(e) {
   debug('Received System Volume Changed event: ' + e.data.level + ' ' + e.data.muted);
 };
 
+manager.onVisibilityChanged = function(e) {
+  debug('Visibility Changed event: ' + e.isVisible);
+  if (e.isVisible) {
+    var trackNum = Player.getCurrentTrackNum();
+    var album = Player.getAlbum();
+    Player.play(trackNum, album.bandId(), album.id());
+  } else {
+    Player.stop();
+  }
+};
+
 
 messageBus.onMessage = function(e) {
   debug('Message [' + e.senderId + ']: ', e.data);

@@ -141,6 +141,10 @@ var Player = assign({}, EventEmitter.prototype, {
     this.play(_trackNum + 1);
   },
 
+  stop: function(){
+    _music.pause();
+  },
+
   emitChange: function(){
     this.emit('CHANGE');
   },
@@ -181,6 +185,10 @@ var Player = assign({}, EventEmitter.prototype, {
         _currentAlbum = currentAlbum;
       }
     }
+  },
+
+  getCurrentTrackNum: function(){
+    return _trackNum;
   },
 
   getCurrentTrack: function(){
