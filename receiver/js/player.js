@@ -85,7 +85,7 @@ var Player = assign({}, EventEmitter.prototype, {
   },
 
   play: function(trackNum, bandId, albumId){
-    debug('play music: Track No.', _trackNum);
+    debug('play music: Track No.', this.getCurrentTrackNum());
 
     var prevAlbum = this.getAlbum();
 
@@ -97,31 +97,31 @@ var Player = assign({}, EventEmitter.prototype, {
       window.close();
     }
 
-    var currentTrackNum = _trackNum;
+    var currentTrackNum = this.getCurrentTrackNum();
     var desc = this.getAlbum().artist() + ' / ' + this.getAlbum().title();
 
     if (trackNum !== undefined) {
       _trackNum = trackNum;
     }
 
-    if (_loop && this.getAlbum().tracks().length <= _trackNum) {
+    if (_loop && this.getAlbum().tracks().length <= this.getCurrentTrackNum()) {
       _trackNum = 0;
 
-      Analytics.sendEvent('player', 'loop', desc, _trackNum + 1, {
+      Analytics.sendEvent('player', 'loop', desc, this.getCurrentTrackNum() + 1, {
         nonInteraction: 1,
-        trackNum: _trackNum + 1,
+        trackNum: this.getCurrentTrackNum() + 1,
         utl: this.getAlbum().url()
       });
     }
 
-    var track = this.getAlbum().track(_trackNum);
+    var track = this.getAlbum().track(this.getCurrentTrackNum());
 
     if (!track.file()) {
       this.playNext();
       return;
     }
 
-    if (_trackNum !== currentTrackNum ||
+    if (this.getCurrentTrackNum() !== currentTrackNum ||
         !prevAlbum.isSameAlbum(bandId, albumId)) {
       _music.src = track.file();
       _music.load();
@@ -131,14 +131,14 @@ var Player = assign({}, EventEmitter.prototype, {
 
     this.emitChange();
 
-    Analytics.sendEvent('player', 'play', desc, _trackNum + 1, {
-      trackNum: _trackNum + 1,
+    Analytics.sendEvent('player', 'play', desc, this.getCurrentTrackNum() + 1, {
+      trackNum: this.getCurrentTrackNum() + 1,
       utl: this.getAlbum().url()
     });
   },
 
   playNext: function(){
-    this.play(_trackNum + 1);
+    this.play(this.getCurrentTrackNum() + 1);
   },
 
   stop: function(){
@@ -193,7 +193,7 @@ var Player = assign({}, EventEmitter.prototype, {
 
   getCurrentTrack: function(){
     if (this.getAlbum().track) {
-      return this.getAlbum().track(_trackNum);
+      return this.getAlbum().track(this.getCurrentTrackNum());
     }
     return new Track();
   },
