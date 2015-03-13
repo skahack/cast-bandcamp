@@ -39,7 +39,9 @@ manager.onVisibilityChanged = function(e) {
   if (e.isVisible) {
     var trackNum = Player.getCurrentTrackNum();
     var album = Player.getAlbum();
-    Player.play(trackNum, album.bandId(), album.id());
+    if (!album.isEmpty()) {
+      Player.play(trackNum, album.bandId(), album.id());
+    }
   } else {
     Player.stop();
   }
