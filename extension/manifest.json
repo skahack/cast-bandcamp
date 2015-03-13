@@ -3,7 +3,7 @@
 
   "name": "Bandcast",
   "description": "Listen to Bandcamp music on your TV via Chromecast",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": "Hiroki Sato",
 
   "content_scripts": [{
