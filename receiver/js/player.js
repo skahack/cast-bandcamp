@@ -24,6 +24,11 @@ function init() {
 
   _mediaManager = new cast.receiver.MediaManager(_music);
 
+  _mediaManager.onEnded = function(){
+    onFinish();
+  };
+
+  // deprecated: Unused in latest cast API.
   // workaround: Can't play next track when fire ended event.
   _mediaManager.customizedStatusCallback = (function(){
     var orig = _mediaManager.customizedStatusCallback.bind(_mediaManager);
