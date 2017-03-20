@@ -4,7 +4,7 @@ function Album(obj) {
   this.empty = true;
   this.data = {
     artist: '',
-    artFullsizeUrl: '',
+    art_id: 0,
     url: '',
     current: {
       id: 0,
@@ -67,7 +67,7 @@ Album.prototype = {
   },
 
   artwork: function(){
-    return this.data.artFullsizeUrl;
+    return `https://f4.bcbits.com/img/a${this.data.art_id}_10.jpg`;
   },
 
   url: function(){
