@@ -1,48 +1,32 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 
-import Player from '../player'
 import PlayerView from '../components/player'
-import ProgressBar from '../components/progress-bar'
+import ProgressBar from '../containers/progressBar'
 import Clock from '../containers/clock'
 
-function getState() {
+const Root = ({ band, album, currentTrack }) => {
+  return (
+    <div>
+      <PlayerView
+        band={band}
+        album={album}
+        currentTrack={currentTrack}
+      />
+      <ProgressBar />
+      <Clock />
+    </div>
+  )
+}
+
+const select = ({ player, bands }) => {
+  const band = bands[player.bandId]
+  const album = band ? band.albums[player.albumId] : null
+  const currentTrack = album ? album.tracks[player.trackNum] : null
   return {
-    album: Player.getAlbum(),
-    currentTrack: Player.getCurrentTrack(),
+    band,
+    album,
+    currentTrack,
   }
 }
-
-class Root extends Component {
-  constructor(props) {
-    super(props)
-    this.state = getState()
-  }
-
-  componentDidMount() {
-    Player.addChangeListener(this._onChange.bind(this))
-  }
-
-  componentWillUnmount() {
-    Player.removeChangeListener(this._onChange.bind(this))
-  }
-
-  render() {
-    return (
-      <div>
-        <PlayerView
-          album={this.state.album}
-          currentTrack={this.state.currentTrack}
-        />
-        <ProgressBar />
-        <Clock />
-      </div>
-    )
-  }
-
-  _onChange() {
-    this.setState(getState())
-  }
-}
-
-export default connect()(Root)
+export default connect(select)(Root)
