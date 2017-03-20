@@ -1,5 +1,6 @@
 var debug = require('debug')('bandcamp::receiver');
 var React = require('react');
+var ReactDOM = require('react-dom');
 var Album = require('./album');
 var Player = require('./player');
 var Root = require('./components/root');
@@ -65,4 +66,4 @@ messageBus.onMessage = function(e) {
 
 manager.start({statusText: "Application is starting"});
 
-React.render(<Root />, document.getElementById('root'));
+ReactDOM.render(<Root />, document.getElementById('root'));
