@@ -1,11 +1,17 @@
-var debug = require('debug')('bandcamp::receiver');
-var React = require('react');
-var ReactDOM = require('react-dom');
-var Album = require('./album');
-var Player = require('./player');
-var Root = require('./components/root');
+const debug = require('debug')('bandcamp::receiver')
+import React from 'react'
+import { render } from 'react-dom'
+import { Provider } from 'react-redux'
+import thunk from 'redux-thunk';
+import { applyMiddleware, createStore } from 'redux'
 
-var namespace = 'urn:x-cast:com.skahack.cast.bandcamp';
+import Album from './album'
+import Player from './player'
+import Root from './containers/root'
+import reducer from './reducers'
+import { initClock } from './actions'
+
+const namespace = 'urn:x-cast:com.skahack.cast.bandcamp'
 
 cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
 var manager = cast.receiver.CastReceiverManager.getInstance();
@@ -66,4 +72,13 @@ messageBus.onMessage = function(e) {
 
 manager.start({statusText: "Application is starting"});
 
-ReactDOM.render(<Root />, document.getElementById('root'));
+const _createStore = applyMiddleware(thunk)(createStore)
+let store = _createStore(reducer)
+store.dispatch(initClock())
+
+render(
+  <Provider store={store}>
+    <Root />
+  </Provider>,
+  document.getElementById('root')
+)
